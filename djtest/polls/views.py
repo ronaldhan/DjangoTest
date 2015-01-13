@@ -1,9 +1,17 @@
 # Create your views here.
 from django.http import HttpResponse
+from polls.models import Poll
+from django.template import Context, loader
 
 
 def index(request):
-    return HttpResponse("hello, this is the index page.")
+    latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
+    t = loader.get_template('polls/index.html')
+    c = Context({
+        'latest_poll_list': latest_poll_list
+    })
+    output = ', '.join([p.question for p in latest_poll_list])
+    return HttpResponse(t.render(c))
 
 
 def detail(request, poll_id):
